@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.auth import hash_password, verify_password, create_access_token, get_current_user
+from app.auth import hash_password, verify_password, create_access_token, get_current_user, create_refresh_token
 from app.database import get_db
-from app.models import User
+from app.models import User, RefreshToken
 from app.schemas import UserCreate, UserResponse
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from typing import cast
 from sqlalchemy.sql import ColumnElement
 
@@ -39,7 +39,28 @@ async def login(user_login: UserCreate, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid username and/or password")
 
     access_token = create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    login_refresh_token = create_refresh_token(data={"sub": user.username})
+
+    new_refresh_token = RefreshToken(token=login_refresh_token, user_id=user.id)
+    db.add(new_refresh_token)
+    return {"access_token": access_token, "refresh_token": login_refresh_token, "token_type": "bearer"}
+
+@router.post("/logout/")
+async def logout(logout_refresh_token: str, db: AsyncSession = Depends(get_db)):
+    await db.execute(delete(RefreshToken).where(cast(ColumnElement[bool], RefreshToken.token == logout_refresh_token)))
+    await db.commit()
+    return {"message": "Logged out successfully"}
+
+@router.post("/refresh/")
+async def refresh_token(token_to_refresh: str, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(RefreshToken).where(cast(ColumnElement[bool], RefreshToken.token == token_to_refresh)))
+    stored_token = result.scalar_one_or_none()
+
+    if not stored_token:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+    new_access_token = create_access_token(data={"sub": stored_token.user.username})
+    return {"access_token": new_access_token, "token_type": "bearer"}
 
 @router.get("/me/")
 def get_me(current_user: User = Depends(get_current_user)):

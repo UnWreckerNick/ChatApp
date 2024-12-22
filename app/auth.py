@@ -40,3 +40,9 @@ async def get_current_user(db: AsyncSession = Depends(get_db), token: str = Depe
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
     return user
+
+def create_refresh_token(data: dict) -> str:
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(days=7)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)

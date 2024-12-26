@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.database import init_db
-from app.routes import chats, messages, users, websocket
+from backend.database import init_db
+from backend.routes import chats, messages, users, websocket
 from contextlib import asynccontextmanager
 
 @asynccontextmanager

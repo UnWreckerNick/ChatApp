@@ -5,9 +5,9 @@ from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone, timedelta
-from app.config import SECRET_KEY, ALGORITHM,ACCESS_TOKEN_EXPIRES_MINUTES
-from app.database import get_db
-from app.models import User
+from backend.config import SECRET_KEY, ALGORITHM,ACCESS_TOKEN_EXPIRES_MINUTES
+from backend.database import get_db
+from backend.models import User
 from typing import cast
 from sqlalchemy.sql import ColumnElement
 

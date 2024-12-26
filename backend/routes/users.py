@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.auth import hash_password, verify_password, create_access_token, get_current_user, create_refresh_token
-from app.database import get_db
-from app.models import User, RefreshToken
-from app.schemas import UserCreate, UserResponse
+from backend.auth import hash_password, verify_password, create_access_token, get_current_user, create_refresh_token
+from backend.database import get_db
+from backend.models import User, RefreshToken
+from backend.schemas import UserCreate, UserResponse
 from sqlalchemy import select, delete
 from typing import cast
 from sqlalchemy.sql import ColumnElement

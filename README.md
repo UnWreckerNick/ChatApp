@@ -89,7 +89,7 @@ ChatApp/
 │  
 ├── backend/  
 │   ├── auth.py                # JWT and authentication logic  
-│   ├── config.py              # Configuration data
+│   ├── config.py              # Configuration data  
 │   ├── database.py            # Database setup and connection  
 │   ├── models.py              # SQLAlchemy models  
 │   ├── routes/                # FastAPI routes  
